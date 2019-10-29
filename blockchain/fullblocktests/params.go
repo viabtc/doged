@@ -9,9 +9,9 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/btcsuite/btcd/chaincfg/chainhash"
-	"github.com/btcsuite/btcd/wire"
+	"github.com/viabtc/doged/chaincfg"
+	"github.com/viabtc/doged/chaincfg/chainhash"
+	"github.com/viabtc/doged/wire"
 )
 
 // newHashFromStr converts the passed big-endian hex string into a
@@ -121,7 +121,7 @@ var regressionNetParams = &chaincfg.Params{
 	RelayNonStdTxs: true,
 
 	// Address encoding magics
-	PubKeyHashAddrID: 0x6f, // starts with m or n
+	PubKeyHashAddrID: 0x71, // starts with m or n
 	ScriptHashAddrID: 0xc4, // starts with 2
 	PrivateKeyID:     0xef, // starts with 9 (uncompressed) or c (compressed)
 

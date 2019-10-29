@@ -9,7 +9,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/btcsuite/btcd/chaincfg/chainhash"
+	"github.com/viabtc/doged/chaincfg/chainhash"
 )
 
 // MaxBlockHeaderPayload is the maximum number of bytes a block header can be.
@@ -109,13 +109,53 @@ func NewBlockHeader(version int32, prevHash, merkleRootHash *chainhash.Hash,
 		Nonce:      nonce,
 	}
 }
+const versionAuxpow = (1<<8)
+func skipAuxpow(r io.Reader) error{
+	tx := MsgTx{}
+	err := tx.BtcDecode(r,0, WitnessEncoding)
+	if err != nil{
+		return err
+	}
+	byte80 := make([]byte,80)
+	byte32 := make([]byte,32)
+	byte4 := make([]byte,4)
+	_,err = r.Read(byte32)
+	if err != nil{
+		return err
+	}
+	for i:=0;i<2;i++{
+		branchLength, err := ReadVarInt(r,0)
+		if err != nil{
+			return err
+		}
+		var j uint64
+		for ;j<branchLength;j++{
+			_,err = r.Read(byte32)
+			if err !=nil{
+				return err
+			}
+		}
+		r.Read(byte4)
+	}
+	
+	r.Read(byte80)
+	return nil
+}
 
 // readBlockHeader reads a bitcoin block header from r.  See Deserialize for
 // decoding block headers stored to disk, such as in a database, as opposed to
 // decoding from the wire.
 func readBlockHeader(r io.Reader, pver uint32, bh *BlockHeader) error {
-	return readElements(r, &bh.Version, &bh.PrevBlock, &bh.MerkleRoot,
+	err:= readElements(r, &bh.Version, &bh.PrevBlock, &bh.MerkleRoot,
 		(*uint32Time)(&bh.Timestamp), &bh.Bits, &bh.Nonce)
+	if err != nil{
+		return err
+	}
+	if (bh.Version&versionAuxpow) == 0{
+		return nil
+	}
+	err = skipAuxpow(r)
+	return err
 }
 
 // writeBlockHeader writes a bitcoin block header to w.  See Serialize for

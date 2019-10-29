@@ -9,8 +9,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/btcsuite/btcd/chaincfg/chainhash"
-	"github.com/btcsuite/btcd/database"
+	"github.com/viabtc/doged/chaincfg/chainhash"
+	"github.com/viabtc/doged/database"
 )
 
 // fetchBlockCmd defines the configuration options for the fetchblock command.
